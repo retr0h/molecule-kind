@@ -1,0 +1,10 @@
+---
+extends: default
+
+ignore: |
+  .github/
+  */cookiecutter/
+  .venv/
+
+rules:
+  line-length: disable
