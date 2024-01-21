@@ -2,7 +2,7 @@
 dependency:
   name: galaxy
 driver:
-  name: kind
+  name: molecule-kind
 platforms:
   - name: instance
 provisioner:

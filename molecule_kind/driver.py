@@ -20,8 +20,6 @@
 
 """Kind Driver Module."""
 
-from __future__ import absolute_import
-
 import os
 
 from molecule.api import Driver
@@ -43,7 +41,7 @@ class Kind(Driver):
     .. code-block:: yaml
 
         driver:
-          name: kind
+          name: molecule-kind
         platforms:
           - name: molecule-cluster
 
@@ -53,7 +51,7 @@ class Kind(Driver):
     def __init__(self, config=None):
         """Construct kind."""
         super(Kind, self).__init__(config)
-        self._name = "kind"
+        self._name = "molecule-kind"
 
     @property
     def name(self):
@@ -88,9 +86,7 @@ class Kind(Driver):
     def ansible_connection_options(self, instance_name):
         x = {"ansible_connection": "docker"}
         if "DOCKER_HOST" in os.environ:
-            x["ansible_docker_extra_args"] = "-H={}".format(
-                os.environ["DOCKER_HOST"]
-            )
+            x["ansible_docker_extra_args"] = "-H={}".format(os.environ["DOCKER_HOST"])
         return x
 
     def sanity_checks(self):

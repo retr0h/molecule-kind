@@ -27,10 +27,9 @@ classifiers = [
     "Operating System :: OS Independent",
 
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 
     "Topic :: System :: Systems Administration",
     "Topic :: Utilities",
@@ -45,17 +44,16 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = ">=3.10"
 
 [tool.poetry.dev-dependencies]
-ansible = "*"
-black = "^20.8b1"
+# molecule plugins are not allowed to mention Ansible as a direct dependency
+black = "*"
 coverage = {extras = ["toml"], version = "*"}
 flake8 = "*"
-hacking = "*"
 isort = "*"
-molecule = "*"
-pytest = "^6.0.1"
+molecule = "^6.0.3"
+pytest = "*"
 pytest-clarity = "*"
 pytest-cov = "*"
 pytest-helpers-namespace = "*"
@@ -72,7 +70,6 @@ build-backend = "poetry.masonry.api"
 kind = "molecule_kind.driver:Kind"
 
 [tool.black]
-line-length = 79
 include = '\.pyi?$'
 skip-string-normalization = true
 
