@@ -7,7 +7,14 @@ molecule-kind - Molecule Kind Driver allows Molecule users to test Ansible code 
 
 ## Dependencies
 
-* [kind][]
+This project has been tested against the following matrix:
+
+| Project  | Version |
+| -------- | ------- |
+| [Kind]   | 0.20    |
+| Python   | 3.10    |
+| Ansible  | 9.1.0   |
+| Molecule | 6.0.3   |
 
 ## Installing
 
@@ -29,5 +36,5 @@ To execute unit tests.
 
 The [MIT] License.
 
-[kind]: https://github.com/kubernetes-sigs/kind
+[Kind]: https://github.com/kubernetes-sigs/kind
 [MIT]: LICENSE
