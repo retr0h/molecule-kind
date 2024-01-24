@@ -3,6 +3,8 @@ import pathlib
 import shutil
 import subprocess
 
+import pytest
+
 from conftest import change_dir_to
 from molecule import logger
 from molecule.util import run_command
@@ -53,9 +55,10 @@ def test_command_init_and_test_scenario(tmp_path: pathlib.Path, DRIVER: str) -> 
         assert result.returncode == 0
 
 
-def test_command_static_scenario() -> None:
+@pytest.mark.parametrize("scenario", [("default", "multinode")])
+def test_command_static_scenario(scenario) -> None:
     """Validate that the scenario we included with code still works."""
-    cmd = ["molecule", "test"]
+    cmd = ["molecule", "test", "-s", scenario]
 
     result = run_command(cmd)
     assert result.returncode == 0

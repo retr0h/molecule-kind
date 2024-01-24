@@ -19,6 +19,8 @@
 # DEALINGS IN THE SOFTWARE.
 """Kind Driver Module."""
 
+import os
+
 from molecule_plugins.docker import driver
 
 
@@ -51,7 +53,38 @@ class Kind(driver.Docker):
         return []
 
     def login_options(self, instance_name):
-        return {"instance": f"{instance_name}-control-plane"}
+        connection_opts = self.ansible_connection_options(instance_name)
+        return {"instance": connection_opts["ansible_host"]}
+
+    def ansible_connection_options(self, instance_name):
+        opts = super().ansible_connection_options(instance_name)
+
+        # Cluster name is set from "MOLECULE_KIND_CLUSTER_NAME" environment
+        # variable or defaults to the name of the molecule scenario.
+        cluster_name = os.environ.get(
+            "MOLECULE_KIND_CLUSTER_NAME", self._config.scenario.name
+        )
+
+        # Get list of platforms and figure out what role this instance is.
+        platforms = self._config.config.get("platforms", [])
+        platform = next((p for p in platforms if p["name"] == instance_name), None)
+        if not platform:
+            raise RuntimeError(f"Unable to find platform with name {instance_name}")
+
+        # Group the platforms by role and figure out the index of this instance
+        # in the list of instances for the role.
+        role = platform.get("role", "control-plane")
+        role_platforms = [
+            p for p in platforms if p.get("role", "control-plane") == role
+        ]
+        role_instance_index = role_platforms.index(platform)
+
+        # Generate the "ansible_host" option based on the role and instance index.
+        opts["ansible_host"] = f"{cluster_name}-{role}"
+        if role_instance_index != 0:
+            opts["ansible_host"] += str(role_instance_index + 1)
+
+        return opts
 
     def reset(self):
         # TODO(mnaser): Remove all "kind" clusters owned by Molecule
