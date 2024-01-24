@@ -17,19 +17,12 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
-
 """Kind Driver Module."""
 
-import os
-
-from molecule.api import Driver
-
-from molecule import logger
-
-log = logger.get_logger(__name__)
+from molecule_plugins.docker import driver
 
 
-class Kind(Driver):
+class Kind(driver.Docker):
     """
     Kind Driver Class.
 
@@ -48,49 +41,18 @@ class Kind(Driver):
     .. _`kind`: https://github.com/kubernetes-sigs/kind
     """  # noqa
 
-    def __init__(self, config=None):
+    def __init__(self, config=None) -> None:
         """Construct kind."""
-        super(Kind, self).__init__(config)
+        super().__init__(config)
         self._name = "molecule-kind"
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        self._name = value
-
-    @property
-    def login_cmd_template(self):
-        return (
-            "docker exec "
-            "-e COLUMNS={columns} "
-            "-e LINES={lines} "
-            "-e TERM=bash "
-            "-e TERM=xterm "
-            "-ti {instance}-control-plane bash"
-        )
 
     @property
     def default_safe_files(self):
         return []
 
-    @property
-    def default_ssh_connection_options(self):
-        return []
-
     def login_options(self, instance_name):
-        return {"instance": instance_name}
-
-    def ansible_connection_options(self, instance_name):
-        x = {"ansible_connection": "docker"}
-        if "DOCKER_HOST" in os.environ:
-            x["ansible_docker_extra_args"] = "-H={}".format(os.environ["DOCKER_HOST"])
-        return x
-
-    def sanity_checks(self):
-        pass
+        return {"instance": f"{instance_name}-control-plane"}
 
     def reset(self):
+        # TODO(mnaser): Remove all "kind" clusters owned by Molecule
         pass

@@ -27,12 +27,10 @@ lint:
 .PHONY: format
 format:
 	poetry run black .
-	poetry run isort .
 
 .PHONY: format-check
 format-check:
 	poetry run black --diff --check .
-	poetry run isort --check-only --diff .
 
 .PHONY: build-dist
 build-dist:

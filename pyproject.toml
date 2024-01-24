@@ -45,13 +45,13 @@ keywords = [
 
 [tool.poetry.dependencies]
 python = ">=3.10"
+molecule-plugins = {extras = ["docker"], version = "^23.5.0"}
 
 [tool.poetry.dev-dependencies]
 # molecule plugins are not allowed to mention Ansible as a direct dependency
 black = "*"
 coverage = {extras = ["toml"], version = "*"}
 flake8 = "*"
-isort = "*"
 molecule = "^6.0.3"
 pytest = "*"
 pytest-clarity = "*"
