@@ -1,0 +1,10 @@
+---
+- name: Destroy Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Destroy KinD cluster
+      changed_when: true
+      ansible.builtin.command:
+        cmd: kind delete cluster --name {{ molecule_yml.platforms[0].name }}

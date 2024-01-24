@@ -1,0 +1,15 @@
+---
+- name: Create Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Assert that only a single cluster is being created
+      ansible.builtin.assert:
+        that: molecule_yml.platforms | length == 1
+        msg: "Only a single cluster can be created at a time"
+
+    - name: Create KinD cluster
+      changed_when: true
+      ansible.builtin.command:
+        cmd: kind create cluster --name {{ molecule_yml.platforms[0].name }}
