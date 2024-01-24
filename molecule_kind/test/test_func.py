@@ -55,7 +55,7 @@ def test_command_init_and_test_scenario(tmp_path: pathlib.Path, DRIVER: str) -> 
         assert result.returncode == 0
 
 
-@pytest.mark.parametrize("scenario", [("default", "multinode")])
+@pytest.mark.parametrize("scenario", ["default", "multinode"])
 def test_command_static_scenario(scenario) -> None:
     """Validate that the scenario we included with code still works."""
     cmd = ["molecule", "test", "-s", scenario]
