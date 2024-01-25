@@ -4,12 +4,9 @@ import shutil
 import subprocess
 
 import pytest
-
-from conftest import change_dir_to
-from molecule import logger
 from molecule.util import run_command
 
-LOG = logger.get_logger(__name__)
+from conftest import change_dir_to
 
 
 def format_result(result: subprocess.CompletedProcess):
