@@ -5,5 +5,6 @@
   gather_facts: false
   tasks:
     - name: "Execute a kubectl command"
-      command: kubectl get pods -A
+      ansible.builtin.command:
+        cmd: kubectl get pods -A
       changed_when: false

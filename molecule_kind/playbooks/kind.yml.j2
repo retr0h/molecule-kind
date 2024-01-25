@@ -1,0 +1,8 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: {{ kind_cluster_name }}
+nodes:
+{% for node in molecule_yml.platforms %}
+- role: {{ node.get('role', 'control-plane') }}
+  labels: {{ node.get('labels', {}) | to_json }}
+{% endfor %}

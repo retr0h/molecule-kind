@@ -17,19 +17,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
-
 """Kind Driver Module."""
 
 import os
 
-from molecule.api import Driver
-
-from molecule import logger
-
-log = logger.get_logger(__name__)
+from molecule_plugins.docker import driver
 
 
-class Kind(Driver):
+class Kind(driver.Docker):
     """
     Kind Driver Class.
 
@@ -48,49 +43,49 @@ class Kind(Driver):
     .. _`kind`: https://github.com/kubernetes-sigs/kind
     """  # noqa
 
-    def __init__(self, config=None):
+    def __init__(self, config=None) -> None:
         """Construct kind."""
-        super(Kind, self).__init__(config)
+        super().__init__(config)
         self._name = "molecule-kind"
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, value):
-        self._name = value
-
-    @property
-    def login_cmd_template(self):
-        return (
-            "docker exec "
-            "-e COLUMNS={columns} "
-            "-e LINES={lines} "
-            "-e TERM=bash "
-            "-e TERM=xterm "
-            "-ti {instance}-control-plane bash"
-        )
 
     @property
     def default_safe_files(self):
         return []
 
-    @property
-    def default_ssh_connection_options(self):
-        return []
-
     def login_options(self, instance_name):
-        return {"instance": instance_name}
+        connection_opts = self.ansible_connection_options(instance_name)
+        return {"instance": connection_opts["ansible_host"]}
 
     def ansible_connection_options(self, instance_name):
-        x = {"ansible_connection": "docker"}
-        if "DOCKER_HOST" in os.environ:
-            x["ansible_docker_extra_args"] = "-H={}".format(os.environ["DOCKER_HOST"])
-        return x
+        opts = super().ansible_connection_options(instance_name)
 
-    def sanity_checks(self):
-        pass
+        # Cluster name is set from "MOLECULE_KIND_CLUSTER_NAME" environment
+        # variable or defaults to the name of the molecule scenario.
+        cluster_name = os.environ.get(
+            "MOLECULE_KIND_CLUSTER_NAME", self._config.scenario.name
+        )
+
+        # Get list of platforms and figure out what role this instance is.
+        platforms = self._config.config.get("platforms", [])
+        platform = next((p for p in platforms if p["name"] == instance_name), None)
+        if not platform:
+            raise RuntimeError(f"Unable to find platform with name {instance_name}")
+
+        # Group the platforms by role and figure out the index of this instance
+        # in the list of instances for the role.
+        role = platform.get("role", "control-plane")
+        role_platforms = [
+            p for p in platforms if p.get("role", "control-plane") == role
+        ]
+        role_instance_index = role_platforms.index(platform)
+
+        # Generate the "ansible_host" option based on the role and instance index.
+        opts["ansible_host"] = f"{cluster_name}-{role}"
+        if role_instance_index != 0:
+            opts["ansible_host"] += str(role_instance_index + 1)
+
+        return opts
 
     def reset(self):
+        # TODO(mnaser): Remove all "kind" clusters owned by Molecule
         pass

@@ -1,0 +1,12 @@
+---
+- name: Destroy Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    kind_cluster_name: "{{ lookup('env', 'MOLECULE_KIND_CLUSTER_NAME') | default(lookup('env', 'MOLECULE_SCENARIO_NAME'), true) }}"
+  tasks:
+    - name: Destroy KinD cluster
+      changed_when: true
+      ansible.builtin.command:
+        cmd: kind delete cluster --name {{ kind_cluster_name }}

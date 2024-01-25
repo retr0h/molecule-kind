@@ -1,0 +1,25 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: molecule-kind
+platforms:
+  - name: control1
+    role: control-plane
+    labels:
+      control-node: enabled
+  - name: worker1
+    role: worker
+    labels:
+      worker-node: enabled
+  - name: worker2
+    role: worker
+    labels:
+      worker-node: enabled
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+lint: |
+  set -e
+  yamllint .

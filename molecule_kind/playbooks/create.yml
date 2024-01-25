@@ -1,0 +1,19 @@
+---
+- name: Create Infrastructure
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    kind_config_file: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}/kind.yml"
+    kind_cluster_name: "{{ lookup('env', 'MOLECULE_KIND_CLUSTER_NAME') | default(lookup('env', 'MOLECULE_SCENARIO_NAME'), true) }}"
+  tasks:
+    - name: Create template with KinD cluster config
+      ansible.builtin.template:
+        src: kind.yml.j2
+        dest: "{{ kind_config_file }}"
+        mode: "0600"
+
+    - name: Create KinD cluster
+      changed_when: true
+      ansible.builtin.command:
+        cmd: kind create cluster --config {{ kind_config_file }}
